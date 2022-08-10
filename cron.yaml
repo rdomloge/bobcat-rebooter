@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: rebooter
+  namespace: bobcat-rebooter
+spec:
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  schedule: "0 0 */2 * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: curl-command
+            image: curlimages/curl
+            imagePullPolicy: Always
+            args: 
+            - /bin/sh
+            - -c
+            - >
+                curl  -H 'Authorization:Basic Ym9iY2F0Om1pbmVy' -X POST 'http://10.0.0.156/admin/reboot'
+          restartPolicy: Never
+          tolerations:
+          - key: "cpu"
+            operator: "Equal"
+            value: "low"
+          - key: "memory"
+            operator: "Equal"
+            value: "low"
